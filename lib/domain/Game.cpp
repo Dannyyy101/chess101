@@ -42,14 +42,17 @@ void Game::runGame(Move *move, Error *error) {
             Piece *self = board_->getBoard()[m[0].getY()][m[0].getX()]->getPiece();
             Piece *enemy = board_->getBoard()[m[1].getY()][m[1].getX()]->getPiece();
             if (self == nullptr) {
+                std::cout<< "No Figure chosen"<< std::endl;
                 error->setErrorMessage("No Figure chosen");
                 continue;
             }
             if (self->getColor() != this->currentPlayer_->getColor()) {
+                std::cout<< "The other player has to move"<< std::endl;
                 error->setErrorMessage("The other player has to move");
                 continue;
             }
             if (enemy != nullptr && self->getColor() == enemy->getColor()) {
+                std::cout<< "Own Figure"<< std::endl;
                 error->setErrorMessage("Own Figure");
                 continue;
             }

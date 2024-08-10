@@ -65,7 +65,7 @@ b_size Board::getBoard() {
 void Board::movePiece(Move *move) {
     std::array<Position, 2> m = move->getMove();
     Piece *piece = this->board_[m[0].getY()][m[0].getX()]->getPiece();
-
+    move->setMoveComplete(false);
     if (piece->isMoveValid(move)) {
         piece->move(m[1]);
 
@@ -89,6 +89,8 @@ void Board::movePiece(Move *move) {
             this->board_[m[1].getY()][m[1].getX()]->setPiece(new Queen("queen", piece->getColor(), piece->getPosition(), piece->getBoard()));
             delete piece;
         }
+    }else{
+        throw std::runtime_error("Bad move");
     }
     move->setMoveComplete(false);
 }
