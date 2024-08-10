@@ -16,9 +16,11 @@ public:
 
     ~Position();
 
-    int getX() const ;
+    int getX() const;
 
-    int getY() const ;
+    int getY() const;
+
+    bool operator==(Position const& obj) const;
 };
 
 #endif

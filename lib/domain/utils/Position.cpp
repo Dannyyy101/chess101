@@ -18,3 +18,7 @@ int Position::getX() const  {
 int Position::getY() const  {
     return this->y;
 }
+
+bool Position::operator==(const Position &obj) const{
+    return obj.y == this->y && obj.x == this->x;
+}

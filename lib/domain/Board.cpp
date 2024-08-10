@@ -11,7 +11,7 @@
 #include "../../include/domain/pieces/King.h"
 #include <iostream>
 
-Board::Board() : board_({}), kings_({}), lastMove_({}), lastPiece(nullptr) {
+Board::Board() : board_({}), kings_({}), lastMove_({}), lastPiece(nullptr), stalemateCounter(1) {
 
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
@@ -69,6 +69,12 @@ void Board::movePiece(Move *move) {
     if (piece->isMoveValid(move)) {
         piece->move(m[1]);
 
+        if(isMoveEqualToOldMove(move)){
+            stalemateCounter++;
+        }else{
+            stalemateCounter = 1;
+        }
+
         this->lastMove_[0] = {m[0].getX(), m[0].getY()};
         this->lastMove_[1] = {m[1].getX(), m[1].getY()};
         this->lastPiece = this->board_[m[1].getY()][m[1].getX()]->getPiece();
@@ -98,4 +104,12 @@ void Board::undoMove() {
 
 std::array<Piece *, 2> Board::getKings() {
     return this->kings_;
+}
+
+bool Board::isMoveEqualToOldMove(Move *move) {
+    return this->lastMove_[0] == move->getMove()[0] && this->lastMove_[1] == move->getMove()[1];
+}
+
+int Board::getStalemateCounter() const {
+    return this->stalemateCounter;
 }

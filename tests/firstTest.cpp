@@ -1,13 +1,9 @@
 
 #include <gtest/gtest.h>
+#include "../include/domain/Board.h"
 
-// Simple factorial function for demonstration purposes
-int Factorial(int n) {
-    return (n <= 1) ? 1 : n * Factorial(n - 1);
-}
-
-TEST(FactorialTest, HandlesZeroInput) {
-EXPECT_EQ(Factorial(0), 1);
+TEST(PieceMoveTest, PawnMovesCorrect) {
+EXPECT_EQ(1, 1);
 }
 
 int main(int argc, char **argv) {

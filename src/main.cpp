@@ -17,7 +17,7 @@ int main() {
 
         window.setUpWindow(board.getBoard());
         window.runWindow(move, error, &board);
-
+        
     } catch (std::exception &e) {
         std::cerr << "Exception: " << e.what() << std::endl;
     }

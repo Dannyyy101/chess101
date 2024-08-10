@@ -1,8 +1,9 @@
 #include "../../include/gui/Window.h"
+#include "../../include/gui/EndScreen.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
-#define SIZE_OF_WINDOW 800
+#define WINDOW_SIZE 800
 
 using namespace std;
 
@@ -14,7 +15,7 @@ void Window::runWindow(Move *move, Error *error, Board *board) {
     std::array<GuiField *, 2> activeFields = {};
     int activeFieldsIndex = 0;
 
-    sf::RenderWindow window(sf::VideoMode(SIZE_OF_WINDOW, SIZE_OF_WINDOW), "Chess");
+    sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "Chess");
 
     while (window.isOpen()) {
         sf::Event event;
@@ -57,9 +58,12 @@ void Window::runWindow(Move *move, Error *error, Board *board) {
         if (error->hasError()) {
             std::string errorMessage = error->getErrorMessage();
             if(errorMessage == "GAME OVER"){
-                sf::Time t = sf::milliseconds(1000);
+                EndScreen endScreen;
+                endScreen.draw(window, "GAME OVER");
+                window.display();
+                sf::Time t = sf::milliseconds(100000);
                 sf::sleep(t);
-                window.close();
+                //window.close();
             }
             //this->displayError(errorMessage);
         }
