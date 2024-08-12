@@ -17,13 +17,16 @@ class Field;
 
 class Piece;
 
-typedef std::array<std::array<Field *, 8>, 8> b_size;
+using std::string, std::array;
+
+typedef array<array<Field *, 8>, 8> b_size;
 
 class Board {
 private:
     b_size board_;
-    std::array<Piece *, 2> kings_;
-    std::array<Position, 2> lastMove_;
+    array<array<string, 8>, 8> * fieldWithNames_;
+    array<Piece *, 2> kings_;
+    array<Position, 2> lastMove_;
     Piece *lastPiece;
 public:
     Board();
@@ -40,9 +43,9 @@ public:
 
     void undoMove();
 
-    std::array<Piece *, 2> getKings();
+    array<Piece *, 2> getKings();
 
-    int getStalemateCounter() const;
+    array<array<string, 8>, 8> * getFieldWithNames();
 };
 
 

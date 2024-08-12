@@ -30,6 +30,7 @@ public:
     Board getBoard();
     void nextPlayer();
     void changePawn(Session * session);
+    bool rochade(Move * move);
 };
 
 

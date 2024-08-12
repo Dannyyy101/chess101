@@ -10,14 +10,14 @@ Window::Window() = default;
 
 Window::~Window() = default;
 
-void Window::runWindow(Session *session, Board *board) {
+void Window::runWindow(Session *session, array<array<string, 8>, 8> * board) {
     std::array<GuiField *, 2> activeFields = {};
     int activeFieldsIndex = 0;
 
     sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "Chess");
     DecisionField field(300, 375, 200, 50, sf::Color::Black);
     while (window.isOpen()) {
-        sf::Event event;
+        sf::Event event{};
 
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
@@ -51,7 +51,7 @@ void Window::runWindow(Session *session, Board *board) {
                     }
                 }
             }
-            this->updateWindow(board->getBoard());
+            this->updateWindow(board);
         }
 
         window.clear(sf::Color::Transparent);
@@ -68,7 +68,6 @@ void Window::runWindow(Session *session, Board *board) {
                 session->changePawnTo(pieceIndex);
             }
         }
-
 
 
         window.display();
@@ -90,29 +89,30 @@ void Window::runWindow(Session *session, Board *board) {
 
 }
 
-void Window::setUpWindow(const b_size board) {
+void Window::setUpWindow(array<array<string, 8>, 8> * board) {
     for (int i = 7; i >= 0; --i) {
         for (int j = 7; j >= 0; --j) {
             float x = j * 100;
             float y = i * 100;
-            this->fields_[i][j] = new GuiField(x, y, 100, 100, board[i][j]->getColor() == Color::WHITE);
-            Piece *piece = board[i][j]->getPiece();
-            if (piece != nullptr) {
-                this->fields_[i][j]->changeImage(piece->getName());
+            this->fields_[i][j] = new GuiField(x, y, 100, 100, (i + j) % 2 == 0);
+            std::string field = (*board)[i][j];
+            if (!field.empty()) {
+                this->fields_[i][j]->changeImage(field);
             } else {
                 this->fields_[i][j]->removeImage();
             }
+
         }
     }
 }
 
-void Window::updateWindow(b_size board) {
+void Window::updateWindow(array<array<string, 8>, 8> * board) {
     for (int i = 7; i >= 0; --i) {
         for (int j = 7; j >= 0; --j) {
             if (fields_[i][j] != nullptr) {
-                Piece *piece = board[i][j]->getPiece();
-                if (piece != nullptr) {
-                    this->fields_[i][j]->changeImage(piece->getName());
+                std::string field = (*board)[i][j];
+                if (!field.empty()) {
+                    this->fields_[i][j]->changeImage(field);
                 } else {
                     this->fields_[i][j]->removeImage();
                 }

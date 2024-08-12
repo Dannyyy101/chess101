@@ -11,7 +11,7 @@
 #include "../../include/domain/pieces/King.h"
 #include <iostream>
 
-Board::Board() : board_({}), kings_({}), lastMove_({}), lastPiece(nullptr){
+Board::Board() : board_({}), fieldWithNames_(new array<array<std::string, 8>, 8>), kings_({}), lastMove_({}), lastPiece(nullptr){
 
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
@@ -80,6 +80,7 @@ void Board::movePiece(Move *move) {
     this->lastMove_[1] = {m[1].getX(), m[1].getY()};
 
     move->setMoveComplete(false);
+    getFieldWithNames();
 }
 
 void Board::undoMove() {
@@ -89,6 +90,7 @@ void Board::undoMove() {
     if (piece) {
         piece->move(lastMove_[0]);
     }
+    getFieldWithNames();
 }
 
 std::array<Piece *, 2> Board::getKings() {
@@ -97,4 +99,18 @@ std::array<Piece *, 2> Board::getKings() {
 
 bool Board::isMoveEqualToOldMove(Move *move) {
     return this->lastMove_[0] == move->getMove()[0] && this->lastMove_[1] == move->getMove()[1];
+}
+
+array<array<string, 8>, 8> * Board::getFieldWithNames() {
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            Piece * piece = this->board_[i][j]->getPiece();
+            std::string field;
+            if(piece){
+                field = piece->getName();
+            }
+            (*this->fieldWithNames_)[i][j] = field;
+        }
+    }
+    return this->fieldWithNames_;
 }

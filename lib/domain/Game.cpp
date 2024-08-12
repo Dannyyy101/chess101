@@ -42,6 +42,8 @@ void Game::runGame(Session *session) {
     bool gameRunning = true;
 
     while (gameRunning) {
+
+        // check piece selection for pawn evolution
         if (session->hasPawnBeenChanged()) {
             changePawn(session);
         }
@@ -51,13 +53,15 @@ void Game::runGame(Session *session) {
                 std::array<Position, 2> m = move->getMove();
                 Piece *piece = board_->getBoard()[m[0].getY()][m[0].getX()]->getPiece();
                 Piece *enemy = board_->getBoard()[m[1].getY()][m[1].getX()]->getPiece();
+
                 if (piece == nullptr) {
                     throw std::runtime_error("No Figure chosen");
                 }
                 if (piece->getColor() != this->currentPlayer_->getColor()) {
                     throw std::runtime_error("The other player has to move");
                 }
-                if (enemy != nullptr && piece->getColor() == enemy->getColor()) {
+                bool moveIsRochade = rochade(move);
+                if (enemy != nullptr && piece->getColor() == enemy->getColor() && !moveIsRochade) {
                     throw std::runtime_error("Own Figure");
                 }
 
@@ -73,12 +77,26 @@ void Game::runGame(Session *session) {
                         valid = false;
                     }
 
-
-                    // TODO Wenn du horade einbaust wird es hier zu Problemen kommen, dann
-                    // musst du noch auf die Farbe des Pawns testen
+                    // pawn evolve when on the other site of the board
                     if (valid && dynamic_cast<Pawn *>(piece) && (m[1].getY() == 0 || m[1].getY() == 7)) {
                         session->setNeedsPawnToEvolve(true);
                         session->setPositionFromPawnToEvolve(m[1]);
+                    }
+
+                    // rochade
+                    if (valid && moveIsRochade && enemy) {
+                        int x = piece->getPosition().getX();
+                        int y = piece->getPosition().getY();
+
+                        piece->setPosition({x == 0 ? 1 : 6, y});
+                        board_->getField({x, y})->setPiece(nullptr);
+                        board_->getField({x = (x == 0 ? 1 : 6), y})->setPiece(piece);
+
+                        board_->getField({x != 1 ? 5 : 2, y})->setPiece(enemy);
+                        enemy->setPosition({x != 1 ? 5 : 2, y});
+
+
+                        this->board_->getFieldWithNames();
                     }
                     Move *lastMove = currentPlayer_->getLastMove();
                     this->currentPlayer_->addMove(move);
@@ -203,4 +221,28 @@ void Game::changePawn(Session *session) {
     board_->getBoard()[position.getY()][position.getX()]->setPiece(piece);
     delete oldPiece;
     session->setNeedsPawnToEvolve(false);
+}
+
+bool Game::rochade(Move *move) {
+
+    Position self = move->getMove()[0];
+    Position position = move->getMove()[1];
+    Piece *king = board_->getField(self)->getPiece();
+    Piece *piece = board_->getField(position)->getPiece();
+
+    if (king && piece && dynamic_cast<King *>(king) && dynamic_cast<Rook *>(piece)) {
+        if (!king->getHasMoved()) {
+            int direction = position.getX() > self.getX() ? 1 : -1;
+            for (int i = 1; i < std::abs(position.getX() - self.getX()); ++i) {
+                if (board_->getField({self.getX() + (i * direction), self.getY()})->getPiece()) {
+                    std::cout << board_->getField({self.getX() + (i * direction), self.getY()})->getPiece()->getName()
+                              << "\n";
+                    return false;
+                }
+            }
+        }
+    } else {
+        return false;
+    }
+    return true;
 }

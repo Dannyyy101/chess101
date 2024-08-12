@@ -9,15 +9,14 @@ int main() {
     Board board = game.getBoard();
     Window window;
 
-
     auto *error = &session.error;
     auto *move = &session.move;
 
     try {
         std::thread gameThread(&Game::runGame, &game, &session);
 
-        window.setUpWindow(board.getBoard());
-        window.runWindow(&session, &board);
+        window.setUpWindow(board.getFieldWithNames());
+        window.runWindow(&session, board.getFieldWithNames());
         
     } catch (std::exception &e) {
         std::cerr << "Exception: " << e.what() << std::endl;

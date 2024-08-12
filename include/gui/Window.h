@@ -12,6 +12,7 @@
 #include "../Session.h"
 
 class GuiField;
+
 typedef std::array<std::array<GuiField *, 8>, 8> f_size;
 
 class Window {
@@ -19,12 +20,18 @@ private:
     f_size fields_{};
 public:
     Window();
+
     ~Window();
-    void setUpWindow(b_size board);
-    void updateWindow(b_size board);
-    void makeMove(Session * session, std::array<float, 2>& newMove);
-    void runWindow(Session * session, Board * board);
-    void displayError(const std::string& errorMessage);
+
+    void setUpWindow(array<array<string, 8>, 8> * board);
+
+    void updateWindow(array<array<string, 8>, 8> * board);
+
+    void makeMove(Session *session, std::array<float, 2> &newMove);
+
+    void runWindow(Session *session, array<array<string, 8>, 8> * board);
+
+    void displayError(const std::string &errorMessage);
 };
 
 #endif // WINDOW_H
