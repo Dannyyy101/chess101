@@ -11,6 +11,7 @@
 #include "utils/Move.h"
 #include <array>
 #include "utils/Error.h"
+#include "../Session.h"
 
 class Board;
 
@@ -19,14 +20,16 @@ private:
     std::array<Player *, 2> players_{};
     Player * currentPlayer_;
     Board * board_;
+    int stalemateCounter;
 public:
     Game();
     ~Game();
     bool isCurrentPlayerInCheckMade();
     bool isGameOver();
-    void runGame(Move * move, Error * error);
+    void runGame(Session * session);
     Board getBoard();
     void nextPlayer();
+    void changePawn(Session * session);
 };
 
 

@@ -3,6 +3,7 @@
 
 #include "../../include/domain/utils/Color.h"
 #include <SFML/Graphics.hpp>
+#include "../gui/Window.h"
 
 class GuiField {
 private:
@@ -13,7 +14,7 @@ private:
 public:
     sf::RectangleShape rect;
 
-    GuiField(int x, int y, int width, int height, int color);
+    GuiField(float x, float y, int width, int height, int color);
 
     ~GuiField();
 

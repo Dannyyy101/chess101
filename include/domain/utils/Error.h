@@ -11,14 +11,13 @@
 class Error {
 private:
     std::string errorMessage_;
-
     mutable std::mutex mutex_;
 public:
     bool hasError_;
     Error();
     ~Error();
     void setErrorMessage(std::string errorMessage);
-    std::string getErrorMessage();
+    const std::string getErrorMessage();
     void changeError(bool error);
     bool hasError();
 };

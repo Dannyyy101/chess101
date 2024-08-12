@@ -5,8 +5,7 @@
 #ifndef CHESS_ENDSCREEN_H
 #define CHESS_ENDSCREEN_H
 
-#define WINDOW_SIZE 800.0
-
+#include <iostream>
 #include <SFML/Graphics.hpp>
 #include "Window.h"
 

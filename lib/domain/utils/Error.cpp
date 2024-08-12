@@ -16,7 +16,7 @@ void Error::setErrorMessage(std::string errorMessage) {
     this->hasError_ = true;
 }
 
-std::string Error::getErrorMessage() {
+const std::string Error::getErrorMessage(){
     std::lock_guard<std::mutex> guard(mutex_);
     this->hasError_ = false;
     return this->errorMessage_;

@@ -25,7 +25,6 @@ private:
     std::array<Piece *, 2> kings_;
     std::array<Position, 2> lastMove_;
     Piece *lastPiece;
-    int stalemateCounter;
 public:
     Board();
 

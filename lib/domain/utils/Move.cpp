@@ -43,3 +43,7 @@ void Move::setMoveComplete(bool complete) {
     this->isMoveComplete_ = complete;
     mutex_.unlock();
 }
+
+bool Move::operator==(const Move &other) {
+    return other.newPosition == this->newPosition && other.positionPiece == this->positionPiece;
+}

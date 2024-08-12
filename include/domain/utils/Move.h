@@ -22,6 +22,7 @@ public:
     void setMoveComplete(bool complete);
     bool isMoveComplete() const;
     std::array<Position, 2> getMove();
+    bool operator==(const Move& other);
 };
 
 

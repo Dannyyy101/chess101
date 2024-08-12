@@ -1,9 +1,8 @@
 #include "../../include/gui/Window.h"
+#include "../../include/gui/DecisionField.h"
 #include "../../include/gui/EndScreen.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
-
-#define WINDOW_SIZE 800
 
 using namespace std;
 
@@ -11,32 +10,41 @@ Window::Window() = default;
 
 Window::~Window() = default;
 
-void Window::runWindow(Move *move, Error *error, Board *board) {
+void Window::runWindow(Session *session, Board *board) {
     std::array<GuiField *, 2> activeFields = {};
     int activeFieldsIndex = 0;
 
     sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "Chess");
-
+    DecisionField field(300, 375, 200, 50, sf::Color::Black);
     while (window.isOpen()) {
         sf::Event event;
+
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
 
             if (event.type == sf::Event::MouseButtonPressed) {
                 if (event.mouseButton.button == sf::Mouse::Left) {
-                    for (int i = 7; i >= 0; --i) {
-                        for (int j = 7; j >= 0; --j) {
-                            if (this->fields_[j][i]->isPressed(window)) {
-                                sf::RectangleShape &rect = fields_[j][i]->getShape();
-                                activeFields[activeFieldsIndex++] = fields_[j][i];
+                    if (session->needsPawnToEvolve()) {
+                        std::array<int, 2> pos = session->getPositionFromPawnToEvolve();
+                        field.setPosition({static_cast<float>(pos[0] * 100), static_cast<float>(pos[1] * 100)});
+                        for (auto button: field.getDecisionButtons()) {
+                            button->isPressed(window);
+                        }
+                    } else {
+                        for (int i = 7; i >= 0; --i) {
+                            for (int j = 7; j >= 0; --j) {
+                                if (this->fields_[j][i]->isPressed(window)) {
+                                    sf::RectangleShape &rect = fields_[j][i]->getShape();
+                                    activeFields[activeFieldsIndex++] = fields_[j][i];
 
-                                std::array<float, 2> newPosition = {rect.getPosition().y, rect.getPosition().x};
-                                this->makeMove(move, newPosition);
-                                if (move->isMoveComplete()) {
-                                    activeFields[0]->unFocus();
-                                    activeFields[1]->unFocus();
-                                    activeFieldsIndex = 0;
+                                    std::array<float, 2> newPosition = {rect.getPosition().y, rect.getPosition().x};
+                                    this->makeMove(session, newPosition);
+                                    if (session->isMoveComplete()) {
+                                        activeFields[0]->unFocus();
+                                        activeFields[1]->unFocus();
+                                        activeFieldsIndex = 0;
+                                    }
                                 }
                             }
                         }
@@ -53,11 +61,21 @@ void Window::runWindow(Move *move, Error *error, Board *board) {
                 this->fields_[j][i]->draw(window);
             }
         }
+        if (session->needsPawnToEvolve()) {
+            field.draw(window);
+            int pieceIndex;
+            if ((pieceIndex = field.getPieceIndex()) != -1) {
+                session->changePawnTo(pieceIndex);
+            }
+        }
+
+
+
         window.display();
 
-        if (error->hasError()) {
-            std::string errorMessage = error->getErrorMessage();
-            if(errorMessage == "GAME OVER"){
+        if (session->hasError()) {
+            std::string errorMessage = session->getError().getErrorMessage();
+            if (errorMessage == "GAME OVER") {
                 EndScreen endScreen;
                 endScreen.draw(window, "GAME OVER");
                 window.display();
@@ -75,8 +93,8 @@ void Window::runWindow(Move *move, Error *error, Board *board) {
 void Window::setUpWindow(const b_size board) {
     for (int i = 7; i >= 0; --i) {
         for (int j = 7; j >= 0; --j) {
-            unsigned x = j * 100;
-            unsigned y = i * 100;
+            float x = j * 100;
+            float y = i * 100;
             this->fields_[i][j] = new GuiField(x, y, 100, 100, board[i][j]->getColor() == Color::WHITE);
             Piece *piece = board[i][j]->getPiece();
             if (piece != nullptr) {
@@ -103,31 +121,8 @@ void Window::updateWindow(b_size board) {
     }
 }
 
-void Window::makeMove(Move *move, std::array<float, 2> &newMove) {
+void Window::makeMove(Session *session, std::array<float, 2> &newMove) {
     int y = newMove[0] / 100;
     int x = newMove[1] / 100;
-    move->addPosition({x, y});
-}
-
-void Window::displayError(const std::string &errorMessage) {
-    // Create the popup window
-    sf::RenderWindow window(sf::VideoMode(400, 200), "Error");
-    sf::Text text;
-    text.setString(errorMessage);
-    text.setCharacterSize(24);
-    text.setFillColor(sf::Color::White);
-    text.setPosition(50, 80);
-    // Main loop to handle events and render the popup window
-    while (window.isOpen()) {
-        sf::Event event{};
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
-                window.close();
-            }
-        }
-
-        window.clear();
-        window.draw(text);
-        window.display();
-    }
+    session->addPositionToMove({x, y});
 }

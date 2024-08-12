@@ -31,7 +31,7 @@ bool Pawn::isValidStraightMove(const Position &position, int direction) {
 }
 
 bool Pawn::isMoveValid(Move *move) {
-    int direction = this->color_ == Color::WHITE ? 1 : -1;
+    int direction = this->color_ == Color::WHITE ? -1 : 1;
     return isValidStraightMove(move->getMove()[1], direction);
 }
 

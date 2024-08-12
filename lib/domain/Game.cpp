@@ -5,9 +5,14 @@
 #include "../../include/domain/Game.h"
 #include "../../include/domain/Player.h"
 #include "../../include/domain/pieces/King.h"
+#include "../../include/domain/pieces/Pawn.h"
+#include "../../include/domain/pieces/Queen.h"
+#include "../../include/domain/pieces/Rook.h"
+#include "../../include/domain/pieces/Knight.h"
+#include "../../include/domain/pieces/Bishop.h"
 #include <iostream>
 
-Game::Game() : board_(new Board()) {
+Game::Game() : board_(new Board()), stalemateCounter(0) {
     this->players_[0] = new Player("Daniel", Color::WHITE);
     this->players_[1] = new Player("Felix", Color::BLACK);
     this->currentPlayer_ = players_[0];
@@ -31,39 +36,67 @@ void Game::nextPlayer() {
     }
 }
 
-void Game::runGame(Move *move, Error *error) {
+void Game::runGame(Session *session) {
+    Move *move = &session->move;
+    Error *error = &session->error;
     bool gameRunning = true;
+
     while (gameRunning) {
-        while (!move->isMoveComplete()) {
+        if (session->hasPawnBeenChanged()) {
+            changePawn(session);
         }
 
         if (move->isMoveComplete()) {
-            std::array<Position, 2> m = move->getMove();
-            Piece *self = board_->getBoard()[m[0].getY()][m[0].getX()]->getPiece();
-            Piece *enemy = board_->getBoard()[m[1].getY()][m[1].getX()]->getPiece();
-            if (self == nullptr) {
-                std::cout<< "No Figure chosen"<< std::endl;
-                error->setErrorMessage("No Figure chosen");
-                continue;
-            }
-            if (self->getColor() != this->currentPlayer_->getColor()) {
-                std::cout<< "The other player has to move"<< std::endl;
-                error->setErrorMessage("The other player has to move");
-                continue;
-            }
-            if (enemy != nullptr && self->getColor() == enemy->getColor()) {
-                std::cout<< "Own Figure"<< std::endl;
-                error->setErrorMessage("Own Figure");
-                continue;
-            }
             try {
-                board_->movePiece(move);
-                if (this->isCurrentPlayerInCheckMade()) {
-                    board_->undoMove();
-                    error->setErrorMessage("Player is in check");
-                    std::cout<< "Player is in check"<< std::endl;
-                    continue;
+                std::array<Position, 2> m = move->getMove();
+                Piece *piece = board_->getBoard()[m[0].getY()][m[0].getX()]->getPiece();
+                Piece *enemy = board_->getBoard()[m[1].getY()][m[1].getX()]->getPiece();
+                if (piece == nullptr) {
+                    throw std::runtime_error("No Figure chosen");
                 }
+                if (piece->getColor() != this->currentPlayer_->getColor()) {
+                    throw std::runtime_error("The other player has to move");
+                }
+                if (enemy != nullptr && piece->getColor() == enemy->getColor()) {
+                    throw std::runtime_error("Own Figure");
+                }
+
+                if (piece->isMoveValid(move)) {
+                    if (m[0] == m[1]) {
+                        throw std::runtime_error("same Position");
+                    }
+                    bool valid = true;
+                    board_->movePiece(move);
+                    if (this->isCurrentPlayerInCheckMade()) {
+                        board_->undoMove();
+                        error->setErrorMessage("Player is in check");
+                        valid = false;
+                    }
+
+
+                    // TODO Wenn du horade einbaust wird es hier zu Problemen kommen, dann
+                    // musst du noch auf die Farbe des Pawns testen
+                    if (valid && dynamic_cast<Pawn *>(piece) && (m[1].getY() == 0 || m[1].getY() == 7)) {
+                        session->setNeedsPawnToEvolve(true);
+                        session->setPositionFromPawnToEvolve(m[1]);
+                    }
+                    Move *lastMove = currentPlayer_->getLastMove();
+                    this->currentPlayer_->addMove(move);
+                    if (valid && lastMove != nullptr) {
+                        if (*lastMove == *move) {
+                            stalemateCounter++;
+                        } else {
+                            stalemateCounter = 0;
+                        }
+                        if (stalemateCounter == 6) {
+                            error->setErrorMessage("GAME OVER");
+                            gameRunning = false;
+                        }
+                    }
+                } else {
+                    throw std::runtime_error("Bad move");
+                }
+
                 nextPlayer();
                 if (isGameOver()) {
                     std::cout << "GAME OVER" << std::endl;
@@ -72,6 +105,8 @@ void Game::runGame(Move *move, Error *error) {
                 }
             }
             catch (std::runtime_error &e) {
+                std::cerr << e.what() << "\n";
+                move->setMoveComplete(false);
                 error->setErrorMessage(e.what());
             }
         }
@@ -111,7 +146,7 @@ bool Game::isGameOver() {
         for (auto field: fields) {
             Piece *piece = field->getPiece();
             if (piece) {
-                if(piece->getColor() != currentPlayer_->getColor()){
+                if (piece->getColor() != currentPlayer_->getColor()) {
                     continue;
                 }
                 for (int i = 0; i < 8; ++i) {
@@ -141,4 +176,31 @@ bool Game::isGameOver() {
     }
     // TODO Eventuell jeden Möglichen versuch auf den Board versuchen also 16 * 64 möglichkeiten testen
     return true;
+}
+
+void Game::changePawn(Session *session) {
+    int index = session->getPieceToChangeTo();
+    Position position = {session->getPositionFromPawnToEvolve()[0], session->getPositionFromPawnToEvolve()[1]};
+    Piece *oldPiece = board_->getBoard()[position.getY()][position.getX()]->getPiece();
+    Piece *piece;
+    switch (index) {
+        case 0:
+            piece = new Queen("queen", oldPiece->getColor(), oldPiece->getPosition(), board_);
+            break;
+        case 1:
+            piece = new Knight("knight", oldPiece->getColor(), oldPiece->getPosition(), board_);
+            break;
+        case 2:
+            piece = new Rook("rook", oldPiece->getColor(), oldPiece->getPosition(), board_);
+            break;
+        case 3:
+            piece = new Bishop("bishop", oldPiece->getColor(), oldPiece->getPosition(), board_);
+            break;
+        default:
+            throw std::runtime_error("Can change to selected Piece");
+    }
+    std::cout << session->getPieceToChangeTo() << "\n";
+    board_->getBoard()[position.getY()][position.getX()]->setPiece(piece);
+    delete oldPiece;
+    session->setNeedsPawnToEvolve(false);
 }

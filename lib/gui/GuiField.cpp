@@ -4,7 +4,7 @@
 #include <iostream>
 
 
-GuiField::GuiField(int x, int y, int width, int height, int color) {
+GuiField::GuiField(float x, float y, int width, int height, int color) {
 
     if (color == 0) {
         this->color_ = sf::Color(235, 236, 208);
@@ -12,7 +12,7 @@ GuiField::GuiField(int x, int y, int width, int height, int color) {
         this->color_ = sf::Color(119, 153, 84);
     }
     this->rect.setFillColor(this->color_);
-    this->rect.setPosition(static_cast<float>(x), static_cast<float>(y));
+    this->rect.setPosition(x, y);
     this->rect.setSize({static_cast<float>(width), static_cast<float>(height)});
 
 }
@@ -27,7 +27,7 @@ void GuiField::draw(sf::RenderWindow &window) {
 
 void GuiField::changeImage(const std::string &url) {
     this->imageUrl = url;
-    const std::string &imagePath = "resources/pieces/" + url + ".png";
+    const std::string &imagePath = IMAGE_PATH + url + ".png";
     if (!this->texture.loadFromFile(imagePath)) {
         std::cerr << "Error loading texture from file: " << imagePath << std::endl;
         return;
