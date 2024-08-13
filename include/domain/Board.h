@@ -29,7 +29,7 @@ private:
     array<Position, 2> lastMove_;
     Piece *lastPiece;
 public:
-    Board();
+    Board(bool standardBoard);
 
     ~Board();
 

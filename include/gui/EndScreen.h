@@ -17,7 +17,7 @@ private:
 public:
     EndScreen();
     ~EndScreen();
-    void draw(sf::RenderWindow& window, std::string winner);
+    void draw(sf::RenderWindow& window, std::string winner, std::string gameEnding);
 };
 
 

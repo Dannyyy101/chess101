@@ -7,7 +7,7 @@ LDFLAGS = -L/opt/homebrew/opt/sfml/lib -L/opt/homebrew/lib -L/opt/homebrew/opt/g
 
 # Source and object files
 SRCS = src/main.cpp lib/gui/Window.cpp lib/gui/GuiField.cpp lib/domain/pieces/Piece.cpp lib/domain/utils/Position.cpp lib/domain/Player.cpp lib/domain/Board.cpp lib/domain/Field.cpp lib/domain/pieces/Pawn.cpp lib/domain/Game.cpp lib/domain/utils/Error.cpp lib/domain/utils/Move.cpp lib/domain/pieces/Knight.cpp lib/domain/pieces/Bishop.cpp lib/domain/pieces/Rook.cpp lib/domain/pieces/Queen.cpp lib/domain/pieces/King.cpp lib/gui/EndScreen.cpp lib/gui/DecisionButton.cpp lib/gui/DecisionField.cpp lib/Session.cpp
-TEST_SRCS = tests/firstTest.cpp
+TEST_SRCS = lib/gui/Window.cpp lib/gui/GuiField.cpp lib/domain/pieces/Piece.cpp lib/domain/utils/Position.cpp lib/domain/Player.cpp lib/domain/Board.cpp lib/domain/Field.cpp lib/domain/pieces/Pawn.cpp lib/domain/Game.cpp lib/domain/utils/Error.cpp lib/domain/utils/Move.cpp lib/domain/pieces/Knight.cpp lib/domain/pieces/Bishop.cpp lib/domain/pieces/Rook.cpp lib/domain/pieces/Queen.cpp lib/domain/pieces/King.cpp lib/gui/EndScreen.cpp lib/gui/DecisionButton.cpp lib/gui/DecisionField.cpp lib/Session.cpp tests/firstTest.cpp
 OBJS = $(SRCS:.cpp=.o)
 TEST_OBJS = $(TEST_SRCS:.cpp=.o)
 

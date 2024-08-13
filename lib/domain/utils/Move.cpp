@@ -8,12 +8,9 @@ Move::Move() : isMoveComplete_(false), index(0) {
 
 }
 
-Move::~Move() {
-
-}
+Move::~Move() = default;
 
 void Move::addPosition(const Position &position) {
-    mutex_.lock();
     if (index == 0) {
         this->positionPiece = position;
         index++;
@@ -27,7 +24,6 @@ void Move::addPosition(const Position &position) {
         this->isMoveComplete_ = false;
         index = 1;
     }
-    mutex_.unlock();
 }
 
 bool Move::isMoveComplete() const {
@@ -39,9 +35,7 @@ std::array<Position, 2> Move::getMove() {
 }
 
 void Move::setMoveComplete(bool complete) {
-   mutex_.lock();
     this->isMoveComplete_ = complete;
-    mutex_.unlock();
 }
 
 bool Move::operator==(const Move &other) {

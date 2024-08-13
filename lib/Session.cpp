@@ -2,11 +2,13 @@
 // Created by Daniel Stöcklein on 11.08.24.
 //
 
+#include <utility>
+
 #include "../include/Session.h"
 
-Session::Session() : pawnChange_(-1) {}
+Session::Session() : pawnChange_(-1), gameRunning_(true) {}
 
-Session::~Session() {}
+Session::~Session() = default;
 
 // Move functions
 bool Session::isMoveValid() const {
@@ -58,7 +60,7 @@ void Session::setPositionFromPawnToEvolve(const Position& position) {
     this->positionFromPawnToEvolve_ = position;
 }
 
-bool Session::needsPawnToEvolve() {
+bool Session::needsPawnToEvolve() const {
     return this->needsPawnToEvolve_;
 }
 
@@ -69,4 +71,29 @@ std::array<int, 2> Session::getPositionFromPawnToEvolve() {
 void Session::setNeedsPawnToEvolve(bool needsPawnToEvolve) {
     this->pawnChange_ = -1;
     this->needsPawnToEvolve_ = needsPawnToEvolve;
+}
+
+// END
+std::string Session::getWinner() {
+    return this->winner_;
+}
+
+void Session::setGameOver() {
+    this->gameRunning_ = false;
+}
+
+void Session::setWinner(std::string winner) {
+    this->winner_ = std::move(winner);
+}
+
+bool Session::isGameRunning() const {
+    return this->gameRunning_;
+}
+
+std::string Session::howHasGameEnded() {
+    return this->gameEnding_;
+}
+
+void Session::setGameEnding(std::string ending) {
+    this->gameEnding_ = std::move(ending);
 }

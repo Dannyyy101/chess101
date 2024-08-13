@@ -14,14 +14,18 @@ private:
     int pawnChange_;
     Position positionFromPawnToEvolve_;
     bool needsPawnToEvolve_;
+    bool gameRunning_;
+    std::string winner_;
+    std::string gameEnding_;
 public:
     Error error;
     Move move;
+
     Session();
 
     ~Session();
 
-    Error& getError();
+    Error &getError();
 
     bool hasError() const;
 
@@ -39,15 +43,27 @@ public:
 
     void changePawnTo(int index);
 
-    void setPositionFromPawnToEvolve(const Position& position);
+    void setPositionFromPawnToEvolve(const Position &position);
 
-    bool needsPawnToEvolve();
+    bool needsPawnToEvolve() const;
 
     void setNeedsPawnToEvolve(bool needsPawnToEvolve);
 
     std::array<int, 2> getPositionFromPawnToEvolve();
 
     int getPieceToChangeTo();
+
+    void setGameOver();
+
+    void setWinner(std::string winner);
+
+    void setGameEnding(std::string ending);
+
+    bool isGameRunning() const;
+
+    std::string howHasGameEnded();
+
+    std::string getWinner();
 };
 
 

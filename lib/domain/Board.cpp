@@ -11,39 +11,42 @@
 #include "../../include/domain/pieces/King.h"
 #include <iostream>
 
-Board::Board() : board_({}), fieldWithNames_(new array<array<std::string, 8>, 8>), kings_({}), lastMove_({}), lastPiece(nullptr){
-
+Board::Board(bool standardBoard) : board_({}), fieldWithNames_(new array<array<std::string, 8>, 8>), kings_({}),
+                                   lastMove_({}), lastPiece(nullptr) {
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
             board_[i][j] = new Field(nullptr, (i + j) % 2 == 0 ? Color::WHITE : Color::BLACK);
         }
     }
+    if (standardBoard) {
 
-    for (int i = 0; i < 8; ++i) {
-        board_[1][i]->setPiece(new Pawn("pawn", Color::BLACK, Position(i, 1), this));
-        board_[6][i]->setPiece(new Pawn("pawn", Color::WHITE, Position(i, 6), this));
+        for (int i = 0; i < 8; ++i) {
+            board_[1][i]->setPiece(new Pawn("pawn", Color::BLACK, Position(i, 1), this));
+            board_[6][i]->setPiece(new Pawn("pawn", Color::WHITE, Position(i, 6), this));
+        }
+
+        board_[0][0]->setPiece(new Rook("rook", Color::BLACK, Position(0, 0), this));
+        board_[0][1]->setPiece(new Knight("knight", Color::BLACK, Position(1, 0), this));
+        board_[0][2]->setPiece(new Bishop("bishop", Color::BLACK, Position(2, 0), this));
+        board_[0][3]->setPiece(new Queen("queen", Color::BLACK, Position(3, 0), this));
+        board_[0][4]->setPiece(new King("king", Color::BLACK, Position(4, 0), this));
+        board_[0][5]->setPiece(new Bishop("bishop", Color::BLACK, Position(5, 0), this));
+        board_[0][6]->setPiece(new Knight("knight", Color::BLACK, Position(6, 0), this));
+        board_[0][7]->setPiece(new Rook("rook", Color::BLACK, Position(7, 0), this));
+
+        board_[7][0]->setPiece(new Rook("rook", Color::WHITE, Position(0, 7), this));
+        board_[7][1]->setPiece(new Knight("knight", Color::WHITE, Position(1, 7), this));
+        board_[7][2]->setPiece(new Bishop("bishop", Color::WHITE, Position(2, 7), this));
+        board_[7][3]->setPiece(new King("king", Color::WHITE, Position(3, 7), this));
+        board_[7][4]->setPiece(new Queen("queen", Color::WHITE, Position(4, 7), this));
+        board_[7][5]->setPiece(new Bishop("bishop", Color::WHITE, Position(5, 7), this));
+        board_[7][6]->setPiece(new Knight("knight", Color::WHITE, Position(6, 7), this));
+        board_[7][7]->setPiece(new Rook("rook", Color::WHITE, Position(7, 7), this));
     }
-
-    board_[0][0]->setPiece(new Rook("rook", Color::BLACK, Position(0, 0), this));
-    board_[0][1]->setPiece(new Knight("knight", Color::BLACK, Position(1, 0), this));
-    board_[0][2]->setPiece(new Bishop("bishop", Color::BLACK, Position(2, 0), this));
-    board_[0][3]->setPiece(new Queen("queen", Color::BLACK, Position(3, 0), this));
-    board_[0][4]->setPiece(new King("king", Color::BLACK, Position(4, 0), this));
-    board_[0][5]->setPiece(new Bishop("bishop", Color::BLACK, Position(5, 0), this));
-    board_[0][6]->setPiece(new Knight("knight", Color::BLACK, Position(6, 0), this));
-    board_[0][7]->setPiece(new Rook("rook", Color::BLACK, Position(7, 0), this));
-
-    board_[7][0]->setPiece(new Rook("rook", Color::WHITE, Position(0, 7), this));
-    board_[7][1]->setPiece(new Knight("knight", Color::WHITE, Position(1, 7), this));
-    board_[7][2]->setPiece(new Bishop("bishop", Color::WHITE, Position(2, 7), this));
-    board_[7][3]->setPiece(new King("king", Color::WHITE, Position(3, 7), this));
-    board_[7][4]->setPiece(new Queen("queen", Color::WHITE, Position(4, 7), this));
-    board_[7][5]->setPiece(new Bishop("bishop", Color::WHITE, Position(5, 7), this));
-    board_[7][6]->setPiece(new Knight("knight", Color::WHITE, Position(6, 7), this));
-    board_[7][7]->setPiece(new Rook("rook", Color::WHITE, Position(7, 7), this));
-
+    // TODO sehr schlecht gelöst
     kings_[0] = board_[7][3]->getPiece();
     kings_[1] = board_[0][4]->getPiece();
+
 }
 
 Board::~Board() {
@@ -101,12 +104,12 @@ bool Board::isMoveEqualToOldMove(Move *move) {
     return this->lastMove_[0] == move->getMove()[0] && this->lastMove_[1] == move->getMove()[1];
 }
 
-array<array<string, 8>, 8> * Board::getFieldWithNames() {
+array<array<string, 8>, 8> *Board::getFieldWithNames() {
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
-            Piece * piece = this->board_[i][j]->getPiece();
+            Piece *piece = this->board_[i][j]->getPiece();
             std::string field;
-            if(piece){
+            if (piece) {
                 field = piece->getName();
             }
             (*this->fieldWithNames_)[i][j] = field;

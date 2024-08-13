@@ -13,7 +13,6 @@ Window::~Window() = default;
 void Window::runWindow(Session *session, array<array<string, 8>, 8> * board) {
     std::array<GuiField *, 2> activeFields = {};
     int activeFieldsIndex = 0;
-
     sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "Chess");
     DecisionField field(300, 375, 200, 50, sf::Color::Black);
     while (window.isOpen()) {
@@ -23,7 +22,7 @@ void Window::runWindow(Session *session, array<array<string, 8>, 8> * board) {
             if (event.type == sf::Event::Closed)
                 window.close();
 
-            if (event.type == sf::Event::MouseButtonPressed) {
+            if (event.type == sf::Event::MouseButtonPressed && session->isGameRunning()) {
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     if (session->needsPawnToEvolve()) {
                         std::array<int, 2> pos = session->getPositionFromPawnToEvolve();
@@ -68,22 +67,15 @@ void Window::runWindow(Session *session, array<array<string, 8>, 8> * board) {
                 session->changePawnTo(pieceIndex);
             }
         }
-
+        if (session->hasError() || !session->isGameRunning()) {
+            std::string errorMessage = session->getError().getErrorMessage();
+            if (errorMessage == "GAME OVER" || !session->isGameRunning()) {
+                EndScreen endScreen;
+                endScreen.draw(window, session->getWinner(), session->howHasGameEnded());
+            }
+        }
 
         window.display();
-
-        if (session->hasError()) {
-            std::string errorMessage = session->getError().getErrorMessage();
-            if (errorMessage == "GAME OVER") {
-                EndScreen endScreen;
-                endScreen.draw(window, "GAME OVER");
-                window.display();
-                sf::Time t = sf::milliseconds(100000);
-                sf::sleep(t);
-                //window.close();
-            }
-            //this->displayError(errorMessage);
-        }
 
     }
 

@@ -12,7 +12,7 @@
 #include "../../include/domain/pieces/Bishop.h"
 #include <iostream>
 
-Game::Game() : board_(new Board()), stalemateCounter(0) {
+Game::Game() : board_(new Board(true)), stalemateCounter(0) {
     this->players_[0] = new Player("Daniel", Color::WHITE);
     this->players_[1] = new Player("Felix", Color::BLACK);
     this->currentPlayer_ = players_[0];
@@ -39,9 +39,8 @@ void Game::nextPlayer() {
 void Game::runGame(Session *session) {
     Move *move = &session->move;
     Error *error = &session->error;
-    bool gameRunning = true;
 
-    while (gameRunning) {
+    while (session->isGameRunning()) {
 
         // check piece selection for pawn evolution
         if (session->hasPawnBeenChanged()) {
@@ -108,7 +107,8 @@ void Game::runGame(Session *session) {
                         }
                         if (stalemateCounter == 6) {
                             error->setErrorMessage("GAME OVER");
-                            gameRunning = false;
+                            session->setGameEnding("DRAW");
+                            session->setGameOver();
                         }
                     }
                 } else {
@@ -119,7 +119,10 @@ void Game::runGame(Session *session) {
                 if (isGameOver()) {
                     std::cout << "GAME OVER" << std::endl;
                     error->setErrorMessage("GAME OVER");
-                    gameRunning = false;
+                    session->setGameOver();
+                    nextPlayer();
+                    session->setWinner(this->currentPlayer_->getName());
+                    session->setGameEnding("CHECKMATE");
                 }
             }
             catch (std::runtime_error &e) {

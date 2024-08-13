@@ -12,7 +12,7 @@ EndScreen::EndScreen() {
 
     this->shape.setPosition({x, y});
 
-    this->shape.setFillColor(sf::Color::Red);
+    this->shape.setFillColor(sf::Color(241, 241, 241));
 
     if(!this->font.loadFromFile("resources/fonts/ARIAL.TTF")){
         std::cerr << "Font not found" << std::endl;
@@ -22,14 +22,13 @@ EndScreen::EndScreen() {
 
 }
 
-EndScreen::~EndScreen() {
+EndScreen::~EndScreen() = default;
 
-}
-
-void EndScreen::draw(sf::RenderWindow& window, std::string winner) {
+void EndScreen::draw(sf::RenderWindow& window, std::string winner, std::string gameEnding) {
     float x = static_cast<float>((WINDOW_SIZE / 2) - (this->shape.getSize().x / 2));
     float y = static_cast<float>((WINDOW_SIZE / 2) - (this->shape.getSize().y / 2));
-    this->text.setString(winner);
+    this->text.setFillColor(sf::Color::Black);
+    this->text.setString(gameEnding + "\n" + winner);
     this->text.setPosition({
         x + (this->shape.getSize().x / 2) - (this->text.getGlobalBounds().getSize().x / 2),
         y + this->shape.getSize().y / 2 - (this->text.getGlobalBounds().getSize().y / 2)
